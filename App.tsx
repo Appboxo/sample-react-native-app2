@@ -11,7 +11,6 @@ import Boxo from '@appboxo/react-native-sdk';
 
 const App = () => {
   Boxo.setConfig('352131', {
-             enableMultitaskMode: true,
              sandboxMode: false,
              isDebug: true,
              showClearCache: false,
@@ -20,7 +19,9 @@ const App = () => {
   });
 
   const openMiniapp = () => {
-    Boxo.openMiniapp('app16973');
+    Boxo.openMiniapp('app_AOwKxi',{
+        pageAnimation: 'RIGHT_TO_LEFT',
+        });
   };
 
   React.useEffect(() => {
@@ -42,36 +43,35 @@ const App = () => {
     const paymentEventsSubscription = Boxo.paymentEvents.subscribe(
       (event) => {
         console.log(event.app_id, ' payment event: ', event)
+        Boxo.hideMiniapps()
         const newEvent = {
           app_id: event.app_id,
           payment_event: {
             ...event.payment_event,
             status: 'success'
           },
-          };
+        };
         Boxo.paymentEvents.send(newEvent);
+        Boxo.openMiniapp(event.app_id);
       },
     );
-
     const lifecycleEventsSubscription = Boxo.lifecycleHooksListener({
           onLaunch: (appId: string) => console.log(appId, 'onLaunch'),
           onResume: (appId: string) => console.log(appId, 'onResume'),
           onClose: (appId: string) => console.log(appId, 'onClose'),
           onPause: (appId: string) => console.log(appId, 'onPause'),
-          onAuth: (appId: string) => {
+          onAuth: async (appId: string) => {
             console.log(appId, 'onAuth');
-
-            fetch('https://demo-hostapp.appboxo.com/api/get_auth_code/')
-            .then((response) => {
-              if (!response.ok) {
-                console.error('Error fetching auth code:');
-                Boxo.setAuthCode(appId, '');
-              }
-              return response.json();
-            })
-            .then((data) => {
+            try {
+              const res = await fetch(
+                'https://demo-hostapp.appboxo.com/api/get_auth_code/'
+              );
+              const data = await res.json();
               Boxo.setAuthCode(appId, data.auth_code);
-            })
+            } catch (e) {
+              console.error(e);
+              Boxo.setAuthCode(appId, '');
+            }
           },
           onError: (appId: string, error: string) =>
             console.log(appId, 'onError', error),
@@ -106,5 +106,3 @@ const styles = StyleSheet.create({
 });
 
 export default App;
-
-
