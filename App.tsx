@@ -19,7 +19,7 @@ const App = () => {
   });
 
   const openMiniapp = () => {
-    Boxo.openMiniapp('app_AOwKxi',{
+    Boxo.openMiniapp('app16973',{
         pageAnimation: 'RIGHT_TO_LEFT',
         });
   };
