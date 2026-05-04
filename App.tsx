@@ -10,21 +10,23 @@ import { View, Button, StyleSheet } from 'react-native';
 import Boxo from '@appboxo/react-native-sdk';
 
 const App = () => {
-  Boxo.setConfig('352131', {
-             sandboxMode: false,
-             isDebug: true,
-             showClearCache: false,
-             showAboutPage : false,
-             showPermissionsPage: false
-  });
-
   const openMiniapp = () => {
-    Boxo.openMiniapp('app_AOwKxi',{
-        pageAnimation: 'RIGHT_TO_LEFT',
-        });
-  };
+    Boxo.openMiniapp('app16973',{
+     pageAnimation: 'RIGHT_TO_LEFT',
+     });
+    };
 
   React.useEffect(() => {
+    Boxo.setConfig('352131', {
+      sandboxMode: false,
+      isDebug: true,
+      showClearCache: false,
+      showAboutPage : false,
+      showPermissionsPage: false
+});
+
+
+
     const customEventsSubscription = Boxo.customEvents.subscribe(
       (event) => {
         console.log(event.app_id, ' custom event: ', event)

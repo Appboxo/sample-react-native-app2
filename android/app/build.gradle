@@ -72,6 +72,12 @@ def enableProguardInReleaseBuilds = false
  */
 def jscFlavor = 'io.github.react-native-community:jsc-android:2026004.+'
 
+// Short CMake staging path (outside deep project tree) — helps stay under Windows MAX_PATH with Ninja.
+final File cxxStagingDir = new File(
+        System.getenv("LOCALAPPDATA") ?: "${System.getProperty("user.home")}/AppData/Local",
+        "RN-CXX/TestBoxoRN")
+cxxStagingDir.mkdirs()
+
 android {
     ndkVersion rootProject.ext.ndkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
@@ -84,6 +90,18 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+        // Windows ~260: CMake mirrors long source paths into .o names; Ninja then fails on Stat().
+        // Too low (e.g. 128) breaks because the object dir alone can exceed that. Too high (e.g. 1280) disables shortening.
+        externalNativeBuild {
+            cmake {
+                arguments "-DCMAKE_OBJECT_PATH_MAX=250"
+            }
+        }
+    }
+    externalNativeBuild {
+        cmake {
+            buildStagingDirectory cxxStagingDir
+        }
     }
     signingConfigs {
         debug {
