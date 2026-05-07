@@ -90,6 +90,8 @@ const App = () => {
       },
       onError: (appId: string, error: string) =>
         console.log(appId, 'onError', error),
+      onUserInteraction: (appId: string) =>
+        console.log(appId, 'onUserInteraction'),
     });
 
     return () => {
